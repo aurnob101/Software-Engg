@@ -1,0 +1,214 @@
+"use client";
+import { Edit, Plus, Trash } from "lucide-react";
+import React, { useEffect } from "react";
+import { Button } from "../ui/button";
+import { useToast } from "../ui/use-toast";
+import DataTable, { HeaderType } from "./datatable";
+import DeleteConfirmation from "./delete-confirmation";
+import { InputType, Update, UpdateProps, ValidateFunction } from "./update";
+import { z } from "zod";
+import { api } from "@/lib/api";
+import {
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	getDocs,
+	updateDoc,
+} from "firebase/firestore";
+import { firestore } from "@/lib/firebase";
+
+type CrudProps = {
+	title: string;
+	inputs: UpdateProps["inputs"];
+	schema?: z.ZodObject<any, any>;
+	path: string;
+	headers: HeaderType[];
+	create?: boolean;
+	edit?: boolean;
+	actions?: (data: any) => React.ReactNode;
+};
+export default function Crud({
+	title,
+	inputs,
+	schema,
+	path,
+	headers,
+	create = true,
+	edit = true,
+	actions,
+}: CrudProps) {
+	const [deletableData, setDeletableData] =
+		React.useState<Record<string, string>>();
+	const [editableData, setEditableData] =
+		React.useState<Record<string, string>>();
+	const [isAdderOpen, setIsAdderOpen] = React.useState(false);
+	const [isFetching, setIsFetching] = React.useState(true);
+	const [data, setData] = React.useState<Record<string, string>[]>([]);
+	const { toast } = useToast();
+	const deleteData = async () => {
+		try {
+			await deleteDoc(doc(firestore, `${path}/${deletableData?.id}`)); //delete from database
+
+			toast({
+				title: "Deleted Successfully!",
+				description: "The data has been deleted successfully!",
+			});
+			fetchData();
+			return {
+				success: true,
+			};
+		} catch (e) {
+			console.log(e);
+			return {
+				error: e,
+				success: false,
+			};
+		}
+	};
+	const updateData = async (values: any) => {
+		if (editableData) {
+			try {
+				await updateDoc(doc(firestore, `${path}/${editableData.id}`), {
+					...values,
+				});
+			} catch (e) {
+				console.log(e);
+			} finally {
+				fetchData();
+			}
+		} else {
+			try {
+				await addDoc(collection(firestore, path), {
+					...values,
+				});
+			} catch (e) {
+				console.log(e);
+			} finally {
+				fetchData();
+			}
+		}
+		toast({
+			title: "Saved Successfully!",
+			description: "The data has been saved successfully!",
+		});
+	};
+	// fetch data from firestore using getDocs
+	const fetchData = async () => { 
+		setIsFetching(true);
+		try {
+			const res = await getDocs(collection(firestore, path));
+			const data = res.docs.map((doc) => {
+				return {
+					id: doc.id,
+					...doc.data(),
+				};
+			});
+			setData(data);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setIsFetching(false);
+		}
+	};
+	useEffect(() => {
+		fetchData(); 
+	}, []); // fetch data in first load of the page
+	
+	const onValidate: ValidateFunction = async (values) => {
+		if (!schema) return { errors: {} };
+		const errors: Record<string, string> = {};
+		try {
+			await schema.parseAsync(values);
+		} catch (error) {
+			if (error instanceof z.ZodError) {
+				error.errors.forEach((err) => {
+					errors[err.path[0]] = err.message;
+				});
+			}
+		}
+		return { errors };
+	};
+
+	return (
+		<div className="bg-white rounded-xl border w-full p-4 pt-8">
+			<Update // update existing data
+				title={title}
+				inputs={inputs}
+				onUpdate={updateData}
+				onClose={() => {
+					setEditableData(undefined);
+				}}
+				isOpen={!!editableData}
+				data={editableData}
+				onValidate={onValidate}
+			/>
+			<Update //new data update
+				title={title}
+				inputs={inputs}
+				onUpdate={updateData}
+				onClose={() => {
+					setIsAdderOpen(false);
+				}}
+				isOpen={isAdderOpen}
+				onValidate={onValidate}
+			/>
+			<DeleteConfirmation //data deletion notification
+				setDeletableData={setDeletableData}
+				deletableData={deletableData}
+				onAction={deleteData}
+			/>
+			<div className="flex items-center gap-2">
+				<h1 className="text-xl font-bold">{title}</h1>
+				{create && (
+					<Button
+						size={"sm"}
+						className="gap-2"
+						onClick={() => {
+							setIsAdderOpen(true);
+						}}
+					>
+						Add {title}
+						<Plus className="w-4 h-4" />
+					</Button>
+				)}
+			</div>
+			<DataTable //shows the data that fetched by use-effect
+				headers={[
+					...headers,
+					{
+						name: "Actions",
+						key: "actions",
+						customRender: (data) => (
+							<div className="flex gap-2">
+								{actions && actions(data)}
+								{edit && (
+									<Button
+										size="sm"
+										variant={"outline"}
+										onClick={() => {
+											setEditableData(data);
+										}}
+									>
+										<Edit className="w-4 h-4" />
+									</Button>
+								)}
+								<Button
+									size="sm"
+									variant={"outline"}
+									onClick={() => {
+										setDeletableData(data);
+									}}
+								>
+									<Trash className="w-4 h-4" />
+								</Button>
+							</div>
+						),
+					},
+				]}
+				data={data}
+				isLoading={isFetching}
+			/>
+		</div>
+	);
+}
