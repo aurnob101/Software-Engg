@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { CircleDotDashed } from "lucide-react";
 import { firestore } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import styles from "./invoice"; // Import the CSS fileles from
+// Import the CSS fileles from
 
 export default function InvoicePage() {
     const { id } = useParams();
