@@ -18,17 +18,17 @@ export default function Products() {
 		(async () => {
 			setIsLoading(true);
 			const products = await getDocs(collection(firestore, "products"));
-			setProducts(products.docs.map((doc) => doc.data()) as any);
+			setProducts(products.docs.map((doc) => ({...doc.data(),id:doc.id})) as any);
 			setIsLoading(false);
 		})();
 	}, []);
 	const filteredProducts = products.filter(
 		(product) =>
-			product.name.toLowerCase().includes(search.toLowerCase()) ||
-			product.code.toLowerCase().includes(search.toLowerCase()) ||
-			product.category.toLowerCase().includes(search.toLowerCase()) ||
-			product.company.toLowerCase().includes(search.toLowerCase()) ||
-			product.grade.toLowerCase().includes(search.toLowerCase())
+			product?.name?.toLowerCase()?.includes(search.toLowerCase()) ||
+			product?.code?.toLowerCase()?.includes(search.toLowerCase()) ||
+			product?.category?.toLowerCase()?.includes(search.toLowerCase()) ||
+			product?.company?.toLowerCase()?.includes(search.toLowerCase()) ||
+			product?.grade?.toLowerCase()?.includes(search.toLowerCase())
 	);
 	return (
 		<>
@@ -99,16 +99,34 @@ const ProductAdder = ({ product }: { product: ProductType }) => {
 	return (
 		<>
 			<div className="flex items-center gap-2">
-				<Button size={"sm"} onClick={() => setQuantity(quantity - 1)}>
+				<Button size={"sm"} onClick={() => {
+					if(quantity > 2)
+					setQuantity(quantity - 1)
+				}}>
 					-
 				</Button>
 				<Input
 					value={quantity}
-					onChange={(e) => setQuantity(parseInt(e.target.value))}
+					onChange={(e) => {
+						if(Number(e.target.value) > Number(product.stock))
+							return  toast({
+								title:"Quantity more than stock"
+						})
+						setQuantity(parseInt(e.target.value))
+					}}
 					type="number"
 					className="w-24 text-center"
+					max={
+						Number(product?.quantity )
+					}
 				/>
-				<Button size={"sm"} onClick={() => setQuantity(quantity + 1)}>
+				<Button size={"sm"} onClick={() => {
+						if(Number(quantity+1) > Number(product.stock))
+							return  toast({
+								title:"Quantity more than stock"
+						})
+					setQuantity(quantity + 1)
+				}}>
 					+
 				</Button>
 			</div>
@@ -140,10 +158,10 @@ const ProductAdder = ({ product }: { product: ProductType }) => {
 							description: `${product.name} added to cart`,
 						});
 						setQuantity(1);
-						router.push("/cart");
+						router.push("/admin/makeSales/cart");
 					}}
 				>
-					Buy Now
+					Sell Now
 				</Button>
 			</div>
 		</>

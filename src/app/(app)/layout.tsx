@@ -5,9 +5,9 @@ import React from "react";
 
 export default function layout({ children }: { children: React.ReactNode }) {
 	return (
-		<main className="flex min-h-screen flex-col items-center max-w-screen-lg  gap-4 p-24 mx-auto self-center">
+		<main className="flex min-h-screen min-w-screen">
 			<CartContextProvider>
-				<Header />
+				{/* <Header /> */}
 				{children}
 			</CartContextProvider>
 		</main>

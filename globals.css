@@ -77,3 +77,9 @@
 .badge {
 	@apply bg-green-200 text-green-800 rounded-full text-xs px-2 py-1;
 }
+
+@media print{
+	.no-print{
+		display: none;
+	}
+}

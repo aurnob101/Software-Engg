@@ -19,7 +19,7 @@ export default function AuthPage({
 	return (
 		<div className="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
 			<a
-				href="/"
+				href="/admin"
 				className="absolute left-4 top-4 p-2 text-lg font-medium md:left-8 md:top-8"
 			>
 				Tiles Management
@@ -65,7 +65,7 @@ export default function AuthPage({
 					<p className="text-muted-foreground text-sm">{description}</p>
 				</div>
 				<AuthForm login={login} emailButtonText="Continue" />
-				<p className="text-muted-foreground px-8 text-center text-sm">
+				{/* <p className="text-muted-foreground px-8 text-center text-sm">
 					By clicking continue, you agree to our{" "}
 					<a
 						href="/terms"
@@ -81,7 +81,7 @@ export default function AuthPage({
 						Privacy Policy
 					</a>
 					.
-				</p>
+				</p> */}
 			</div>
 		</div>
 	);

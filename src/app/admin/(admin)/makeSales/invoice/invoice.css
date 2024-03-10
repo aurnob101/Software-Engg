@@ -1,0 +1,16 @@
+/* invoice.css */
+
+@media print {
+    body * {
+      visibility: hidden;
+    }
+    #invoicePage, #invoicePage * {
+      visibility: visible;
+    }
+    #invoicePage {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
+  

@@ -50,7 +50,7 @@ export default function Home() {
 						<Button
 							size={"sm"}
 							onClick={() => {
-								window.open(`/invoice/${data.id}`);
+								window.open(`/admin/makeSales/invoice/${data.id}`);
 							}}
 						>
 							View Invoice

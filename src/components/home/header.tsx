@@ -10,15 +10,15 @@ export default function Header() {
 	const { cart } = useCart();
 	const products = cart?.products.length;
 	return (
-		<div className="flex items-center justify-between w-full">
-			<Link className="text-lg font-semibold" href="/">
+		<div className="flex items-center justify-between w-full no-print">
+			<Link className="text-lg font-semibold" href="/admin/makeSales">
 				Tile Management
 			</Link>
 			<div className="flex items-center gap-2 justify-end">
 				<Button
 					variant={"link"}
 					onClick={() => {
-						router.push("/cart");
+						router.push("/admin/makeSales/cart");
 					}}
 				>
 					Cart ({products})

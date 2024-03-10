@@ -71,7 +71,7 @@ export default function AuthForm({
 					<div className="grid gap-1">
 						<Input
 							id="email"
-							placeholder="name@example.com"
+							placeholder="name@gmail.com"
 							type="email"
 							name="email"
 							disabled={isLoading}

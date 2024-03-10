@@ -14,6 +14,7 @@ export function Sidebar({ className }: SidebarProps) {
 		{ label: "Dashboard", href: "/admin", icon: Home },
 		{ label: "Products", href: "/admin/products", icon: LayoutDashboard },
 		{ label: "Sales", href: "/admin/sales", icon: ShoppingCart },
+		{ label: "Make Sales", href: "/admin/makeSales", icon: ShoppingCart },
 		{ label: "Customers", href: "/admin/customers", icon: Users },
 		{ label: "Admins", href: "/admin/admins", icon: Users },
 	];
